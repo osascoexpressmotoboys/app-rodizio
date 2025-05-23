@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Lista de Rodízio</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #000; color: #fff; }
+    .container { max-width: 600px; margin: auto; background: #111; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px #333; }
+    h1, h2, h3 { text-align: center; color: #fff; }
+    input[type="text"], textarea { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: none; background: #222; color: #fff; }
+    button { width: 100%; padding: 10px; margin-top: 10px; background: #d86718; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #222; }
+    th, td { padding: 10px; border: 1px solid #444; text-align: center; color: #fff; }
+    .fila { margin-top: 30px; }
+    img.logo { display: block; margin: 0 auto 20px auto; max-width: 150px; }
+    .descricao { text-align: center; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="logo.png" alt="Logo Osasco Express" class="logo">
+    <h1>Lista de Rodízio</h1>
+    <p class="descricao">Digite seu nome completo abaixo. A ordem será registrada automaticamente com horário de Brasília. A equipe da base usará esta lista para chamar os entregadores por ordem de chegada. Ao final do dia, tudo é zerado e o relatório enviado por e-mail. Se houver qualquer injustiça, use o botão de reclamação anônima.</p>
+
+    <input type="text" id="nome" placeholder="Digite seu nome completo">
+    <button onclick="registrar()">Entrar na fila</button>
+
+    <div class="fila">
+      <h3>Fila Atual</h3>
+      <table>
+        <thead>
+          <tr><th>Nome</th><th>Horário</th><th>Posição</th></tr>
+        </thead>
+        <tbody id="tabelaFila"></tbody>
+      </table>
+      <button onclick="proximo()">Próximo da fila</button>
+    </div>
+
+    <h3>Reclamação Anônima</h3>
+    <textarea id="reclamacao" rows="4" placeholder="Descreva sua reclamação"></textarea>
+    <button onclick="enviarReclamacao()">Enviar Reclamação</button>
+  </div>
+
+  <script>
+    let fila = [];
+
+    function registrar() {
+      const nomeInput = document.getElementById('nome');
+      const nome = nomeInput.value.trim();
+      if (!nome) return alert('Digite um nome válido');
+
+      const agora = new Date();
+      const horario = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
+      fila.push({ nome, horario });
+      nomeInput.value = '';
+      atualizarTabela();
+    }
+
+    function proximo() {
+      if (fila.length > 0) {
+        const primeiro = fila.shift();
+        fila.push(primeiro);
+        atualizarTabela();
+      }
+    }
+
+    function atualizarTabela() {
+      const tabela = document.getElementById('tabelaFila');
+      tabela.innerHTML = '';
+      fila.forEach((item, index) => {
+        const linha = `<tr><td>${item.nome}</td><td>${item.horario}</td><td>${index + 1}</td></tr>`;
+        tabela.innerHTML += linha;
+      });
+    }
+
+    function enviarReclamacao() {
+      const mensagem = document.getElementById('reclamacao').value.trim();
+      if (!mensagem) return alert('Digite sua reclamação antes de enviar');
+
+      const link = `mailto:seuemail@osascoexpress.com?subject=Reclamação%20Anônima&body=${encodeURIComponent(mensagem)}`;
+      window.location.href = link;
+      document.getElementById('reclamacao').value = '';
+    }
+  </script>
+</body>
+</html>
